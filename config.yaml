@@ -1,2 +1,2 @@
-path: "path_to_model.joblib
+path: "knn_model.joblib"
 features: ['MDVP:Fo(Hz)', 'MDVP:Jitter(%)']
