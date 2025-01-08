@@ -1,33 +1,24 @@
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-import joblib
-
-
-!wget https://raw.githubusercontent.com/yotam-biu/ps9/main/parkinsons.csv -O parkinsons.csv
-
 
 df = pd.read_csv('parkinsons.csv')
+df = df.dropna()
 
-x = df[['MDVP:Fo(Hz)', 'MDVP:Jitter(%)']]
+x = df['MDVP:Fo(Hz)', 'MDVP:Jitter(%)']
 y = df['status']
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
-
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 
 scaler = MinMaxScaler()
-x_train_scaled = scaler.fit_transform(x_train)
-x_test_scaled = scaler.transform(x_test)
-
-
+x_scale = scaler.fit_transform(x)
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x_scale, y, test_size=0.2, random_state=42)
 knn = KNeighborsClassifier(n_neighbors=5)
-knn.fit(x_train_scaled, y_train)
+knn.fit(x_scale, y)
+from sklearn.metrics import accuracy_score
 
-y_pred = knn.predict(x_test_scaled)
+y_pred = knn.predict(x_test)
 accuracy = accuracy_score(y_test, y_pred)
-print(f"דיוק המודל: {accuracy:.2f}")
+print(accuracy)
 
-joblib.dump(knn, 'knn_model.joblib')
