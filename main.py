@@ -30,3 +30,4 @@ knn.fit(x_train_scaled, y_train)
 y_pred = knn.predict(x_test_scaled)
 accuracy = accuracy_score(y_test, y_pred)
 print(f"דיוק המודל: {accuracy:.2f}")
+
