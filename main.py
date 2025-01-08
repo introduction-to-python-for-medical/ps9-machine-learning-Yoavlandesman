@@ -1,24 +1,32 @@
+# יבוא ספריות נדרשות
 import pandas as pd
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
+# טעינת הנתונים והסרת ערכים חסרים
 df = pd.read_csv('parkinsons.csv')
 df = df.dropna()
 
-x = df['MDVP:Fo(Hz)', 'MDVP:Jitter(%)']
+# בחירת עמודות המאפיינים ועמודת המטרה
+x = df[['MDVP:Fo(Hz)', 'MDVP:Jitter(%)']]
 y = df['status']
 
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
+# פיצול לנתוני אימון ונתוני בדיקה
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
+# נרמול הנתונים
 scaler = MinMaxScaler()
-x_scale = scaler.fit_transform(x)
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
-x_train, x_test, y_train, y_test = train_test_split(x_scale, y, test_size=0.2, random_state=42)
+x_train_scaled = scaler.fit_transform(x_train)
+x_test_scaled = scaler.transform(x_test)
+
+# בניית מודל KNN
 knn = KNeighborsClassifier(n_neighbors=5)
-knn.fit(x_scale, y)
-from sklearn.metrics import accuracy_score
+knn.fit(x_train_scaled, y_train)
 
-y_pred = knn.predict(x_test)
+# חיזוי ובדיקת דיוק המודל
+y_pred = knn.predict(x_test_scaled)
 accuracy = accuracy_score(y_test, y_pred)
-print(accuracy)
-
+print(f"דיוק המודל: {accuracy:.2f}")
