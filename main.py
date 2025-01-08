@@ -1,30 +1,33 @@
-%load_ext autoreload
-%autoreload 2
-
-# Download the data from your GitHub repository
-!wget https://raw.githubusercontent.com/yotam-biu/ps9/main/parkinsons.csv -O /content/parkinsons.csv
-
 import pandas as pd
-
-df = pd.read_csv('parkinsons.csv')
-df.head()
-x = df[['MDVP:Fo(Hz)', 'MDVP:Jitter(%)']]
-y = df['status']
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-
-scaler = MinMaxScaler()
-x_scale = scaler.fit_transform(x)
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
-x_train, x_test, y_train, y_test = train_test_split(x_scale, y, test_size=0.2, random_state=42)
-knn = KNeighborsClassifier(n_neighbors=5)
-knn.fit(x_scale, y)
 from sklearn.metrics import accuracy_score
-
-y_pred = knn.predict(x_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy}")
 import joblib
+
+
+!wget https://raw.githubusercontent.com/yotam-biu/ps9/main/parkinsons.csv -O parkinsons.csv
+
+
+df = pd.read_csv('parkinsons.csv')
+
+x = df[['MDVP:Fo(Hz)', 'MDVP:Jitter(%)']]
+y = df['status']
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+
+
+scaler = MinMaxScaler()
+x_train_scaled = scaler.fit_transform(x_train)
+x_test_scaled = scaler.transform(x_test)
+
+
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(x_train_scaled, y_train)
+
+y_pred = knn.predict(x_test_scaled)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"דיוק המודל: {accuracy:.2f}")
 
 joblib.dump(knn, 'knn_model.joblib')
